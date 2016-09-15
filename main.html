@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gamedev Canvas Workshop</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        canvas {
+            background: #eeeeee;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="480px" height="320px"></canvas>
+
+<script>
+    //Access canvas and store the 2D rendering into var
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+
+    //Set position on screen
+    var x = canvas.width / 2;
+    var y = canvas.height - 30;
+    var dx = 2;
+    var dy = -2;
+    //Defining ball and paddles
+    var ballRadius = 10;
+    var paddleHeight = 10;
+    var paddleWidth = 75;
+    var paddleX = (canvas.width-paddleWidth)/2;
+
+    var rightPress = false;
+    var leftPress = false;
+
+    //Setting up event listeners for keypress
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+
+
+    //Draw the purple paddle
+    function drawPaddle() {
+        ctx.beginPath();
+        ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = "#4E2683";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+
+    //Function to draw the ball in canvas
+    function drawBall() {
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle = "#FFC52F";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+
+    //key code 37 = left cursor and 39 = right
+    function keyDownHandler(event) {
+        if(event.keyCode == 39) {
+            rightPress = true;
+        }
+        else  if (event.keyCode == 37) {
+            leftPress = true;
+        }
+    }
+
+    function keyUpHandler(event) {
+        if(event.keyCode == 39) {
+            rightPress = false;
+        }
+        else  if (event.keyCode == 37) {
+            leftPress = false;
+        }
+    }
+
+
+    //Clear and move ball
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall();
+        drawPaddle();
+
+        //Setting the box up for the ball to bounce off
+//
+//        //Sides of box
+        if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+            dx = -dx;
+        }
+
+        //This part removes the bottom of the box and alerts user of Game over
+        if(y + dy < ballRadius) {
+            dy = -dy;
+        }
+        else if(y + dy > canvas.height-ballRadius) {
+            if(x > paddleX && x < paddleX + paddleWidth) {
+                dy = -dy;
+            }
+            else {
+                alert("GAME OVER");
+                document.location.reload();
+            }
+        }
+
+        //paddle moving logic so it does not move outside box
+        if(rightPress && paddleX < canvas.width-paddleWidth) {
+            paddleX += 7;
+        }
+        else if(leftPress && paddleX > 0) {
+            paddleX -= 7;
+        }
+
+        x += dx;
+        y += dy;
+    }
+
+    //Set time to draw the ball every 10 ms
+    //TODO give the user the ability to set the game speed by changing setInterval
+    setInterval(draw, 10);
+
+</script>
+</body>
+</html>
